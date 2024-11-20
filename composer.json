@@ -1,0 +1,31 @@
+{
+    "name": "enicore/maris",
+    "description": "A set of PHP utilities.",
+    "autoload": {
+        "psr-4": {
+            "Enicore\\Maris\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.3",
+        "ext-pdo": "*",
+        "ext-openssl": "*",
+        "ext-zlib": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
+        "ext-intl": "*",
+        "enshrined/svg-sanitize": "^0.15.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Enicore Solutions",
+            "homepage": "https://enicore.com"
+        }
+    ]
+}
+
