@@ -10,13 +10,51 @@ namespace Enicore\Maris;
  * session, and managing user-specific information. The class interacts with the session to store, retrieve, and remove
  * user data.
  *
- * @property object|null $session
+ * @property Session $session
  * @package Enicore\Maris
  */
 class Auth
 {
-    use Injection;
-    use Singleton;
+    public function __construct(private readonly Session $session,
+                                private readonly string $sessionKey = 'auth_user_data')
+    {
+    }
+
+    /**
+     * Sets the user data in the session.
+     *
+     * @param array $userData
+     * @param bool $regenerateSessionId
+     * @return void
+     */
+    public function login(array $userData, bool $regenerateSessionId = true): void
+    {
+        if (empty($userData['userId'])) {
+            throw new \InvalidArgumentException("User ID is required.");
+        }
+
+        // regenerate session id to prevent session fixation attacks
+        if ($regenerateSessionId) {
+            $this->session->regenerate();
+        }
+
+        $this->session->set($this->sessionKey, $userData);
+    }
+
+    /**
+     * Removes the user data from the session.
+     *
+     * @param bool $destroySession
+     * @return void
+     */
+    public function logout(bool $destroySession = true): void
+    {
+        if ($destroySession) {
+            $this->session->destroy();
+        } else {
+            $this->session->remove($this->sessionKey);
+        }
+    }
 
     /**
      * Checks if the user is logged in by verifying if user data exists in the session.
@@ -25,7 +63,7 @@ class Auth
      */
     public function isLoggedIn(): bool
     {
-        return !empty($this->session->get("userData"));
+        return !empty($this->session->get($this->sessionKey));
     }
 
     /**
@@ -35,7 +73,7 @@ class Auth
      */
     public function getUserData(): mixed
     {
-        return $this->session->get("userData");
+        return $this->session->get($this->sessionKey);
     }
 
     /**
@@ -60,28 +98,5 @@ class Auth
         return $userData && array_key_exists($key, $userData) ? $userData[$key] : null;
     }
 
-    /**
-     * Sets the user data in the session.
-     *
-     * @param array $data An associative array of user data to store in the session.
-     * @return void
-     */
-    public function setUserData(array $data): void
-    {
-        if (empty($data['userId'])) {
-            throw new \InvalidArgumentException("User ID is required.");
-        }
 
-        $this->session->set("userData", $data);
-    }
-
-    /**
-     * Removes the user data from the session.
-     *
-     * @return void
-     */
-    public function removeUserData(): void
-    {
-        $this->session->remove("userData");
-    }
 }

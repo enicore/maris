@@ -213,8 +213,7 @@ class Disk
     }
 
     /**
-     * Retrieves the MIME type of a file based on its content. Uses the `finfo_file` function to determine the MIME type
-     * of the file. Special handling is done for SVG and ICO file types.
+     * Retrieves the MIME type of the file based on its content. Special handling is done for SVG and ICO file types.
      *
      * @param string $filePath The path to the file whose MIME type is to be determined.
      * @return string The MIME type of the file, simplified for SVG and ICO files.

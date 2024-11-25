@@ -14,7 +14,7 @@ class Text
      * @return string The human-readable file size (e.g., "1.5 MB").
      */
 
-    static public function sizeToString(string|int $size): string
+    public static function sizeToString(string|int $size): string
     {
         if (!is_numeric($size)) {
             return "-";

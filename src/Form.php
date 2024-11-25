@@ -51,14 +51,6 @@ class Form
     }
 
     /**
-     * Sends an error response with the current form elements and their error states.
-     */
-    public function sendErrorResponse(): void
-    {
-        $this->response->error("Correct the highlighted errors.", ["elements" => $this->elements]);
-    }
-
-    /**
      * Sets the form elements, adding missing properties to each element. This method checks each element and ensures
      * that required properties like `title`, `info`, `value`, etc., are set. If a property is missing, a default value
      * is provided.

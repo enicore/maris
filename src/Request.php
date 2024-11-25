@@ -9,14 +9,10 @@ namespace Enicore\Maris;
  * Handles request data from GET, POST, and JSON input, providing access to and manipulation of request parameters.
  * Integrates a singleton pattern and dependency injection.
  *
- * @property object|null $code Used for decoding request-specific data, like IDs.
  * @package Enicore\Maris
  */
 class Request
 {
-    use Injection;
-    use Singleton;
-
     private array $data = [];
 
     public function __construct()

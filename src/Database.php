@@ -18,26 +18,22 @@ use PDOStatement;
  */
 class Database
 {
-    use Injection;
-    use Singleton;
-
     protected PDO $pdo;
 
     /**
      * Constructor to initialize the PDO instance with provided settings.
      *
-     * @param array|null $settings Database connection settings
+     * @param string $host
+     * @param string|int $port
+     * @param string $database
+     * @param string $username
+     * @param string $password
+     * @param array $options
      */
-    public function __construct(array|null $settings = [])
+    public function __construct(string $host, string|int $port, string $database, string $username, string $password,
+                                array $options = [])
     {
-        $this->pdo = new PDO(
-            "mysql:host={$settings['host']};port={$settings['port']};dbname={$settings['database']}",
-            $settings['username'],
-            $settings['password'],
-            $settings['options'] ?? []
-        );
-
-        // Set PDO error mode to exception and configure character set
+        $this->pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, $options);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->pdo->exec("SET CHARACTER SET utf8;SET NAMES utf8;");
     }
@@ -120,7 +116,7 @@ class Database
 
         foreach ($whereParams as $key => $val) {
             $where[] = "$key=:$key";
-            $params[":" . $key] = $val;
+            $params[":$key"] = $val;
         }
 
         $fields = implode(",", $selectFields);
@@ -156,7 +152,7 @@ class Database
 
         foreach ($whereParams as $key => $val) {
             $where[] = "$key=:$key";
-            $params[":" . $key] = $val;
+            $params[":$key"] = $val;
         }
 
         $fields = implode(",", $selectFields);
@@ -189,7 +185,6 @@ class Database
      */
     public function getLastError(): string
     {
-        // Get the error for the last executed query
         $array = $this->pdo->errorInfo();
         return $array[2];
     }
@@ -248,8 +243,8 @@ class Database
 
         foreach ($data as $key => $val) {
             $keys[] = $key;
-            $values[] = ":" . $key;
-            $params[":" . $key] = $val;
+            $values[] = ":$key";
+            $params[":$key"] = $val;
         }
 
         return $this->query(
@@ -279,7 +274,7 @@ class Database
 
         foreach ($whereParams as $key => $val) {
             $where[] = "$key=:$key";
-            $params[":" . $key] = $val;
+            $params[":$key"] = $val;
         }
 
         return $this->query(
@@ -302,7 +297,7 @@ class Database
 
         foreach ($whereParams as $key => $val) {
             $where[] = "$key=:$key";
-            $params[":" . $key] = $val;
+            $params[":$key"] = $val;
         }
 
         return $this->query("DELETE FROM `$table` WHERE " . implode(" AND ", $where), $params);
