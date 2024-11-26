@@ -15,7 +15,8 @@
         "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-intl": "*",
-        "enshrined/svg-sanitize": "^0.15.4"
+        "enshrined/svg-sanitize": "^0.15.4",
+        "psr/container": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.0"
@@ -28,4 +29,3 @@
         }
     ]
 }
-

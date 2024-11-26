@@ -21,13 +21,23 @@ class Auth
     }
 
     /**
+     * Retrieves the user data from the session.
+     *
+     * @return mixed|null The user data stored in the session or null if not set.
+     */
+    public function getUserData(): mixed
+    {
+        return $this->session->get($this->sessionKey);
+    }
+
+    /**
      * Sets the user data in the session.
      *
      * @param array $userData
      * @param bool $regenerateSessionId
      * @return void
      */
-    public function login(array $userData, bool $regenerateSessionId = true): void
+    public function setUserData(array $userData, bool $regenerateSessionId = true): void
     {
         if (empty($userData['userId'])) {
             throw new \InvalidArgumentException("User ID is required.");
@@ -47,7 +57,7 @@ class Auth
      * @param bool $destroySession
      * @return void
      */
-    public function logout(bool $destroySession = true): void
+    public function removeUserData(bool $destroySession = true): void
     {
         if ($destroySession) {
             $this->session->destroy();
@@ -64,16 +74,6 @@ class Auth
     public function isLoggedIn(): bool
     {
         return !empty($this->session->get($this->sessionKey));
-    }
-
-    /**
-     * Retrieves the user data from the session.
-     *
-     * @return mixed|null The user data stored in the session or null if not set.
-     */
-    public function getUserData(): mixed
-    {
-        return $this->session->get($this->sessionKey);
     }
 
     /**

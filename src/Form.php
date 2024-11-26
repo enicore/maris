@@ -25,10 +25,9 @@ namespace Enicore\Maris;
  */
 class Form
 {
-    use Injection;
-
     private array $elements = [];
     private array $inputs = ["text", "textarea", "select", "check", "image", "color", "custom"];
+    private ?Database $db;
 
     /**
      * Constructor method to initialize form elements.
@@ -37,6 +36,7 @@ class Form
      */
     public function __construct(array $elements = [])
     {
+        $this->db = Di::db();
         $this->setElements($elements);
     }
 

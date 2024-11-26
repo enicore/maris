@@ -18,12 +18,12 @@ namespace Enicore\Maris;
  */
 class Model
 {
-    use Injection;
-
     protected string $table = ""; // can be overloaded in the derived classes
     protected array $publicFields = [];
     protected array $data = [];
     private bool $loaded = false;
+    protected ?Auth $auth;
+    protected ?Database $db;
 
     /**
      * Model constructor. Initializes the table name, sets dependencies, runs initialization hooks,
@@ -31,9 +31,10 @@ class Model
      *
      * @param int|string $id Optional ID for loading the initial record data.
      */
-    public function __construct(int|string $id = 0)
+    public function __construct($id = 0)
     {
-        $this->injectDependencies();
+        $this->auth = Di::auth();
+        $this->db = Di::db();
 
         // set the table name to plural of the model name
         if (empty($this->table)) {
@@ -131,7 +132,7 @@ class Model
                         $data[$key] = (string)(int)$data[$key];
                     } else {
                         // if the value is empty or zero, don't encode it
-                        $data[$key] = (int)$data[$key] ? $this->code->encodeId((int)$data[$key]) : "";
+                        $data[$key] = (int)$data[$key] ? Code::encodeId((int)$data[$key]) : "";
                     }
                     break;
                 case "bool":
@@ -193,7 +194,7 @@ class Model
             }
 
             $data[$key] = match ($options["type"]) {
-                "int", "integer" => empty($options['encoded']) ? (int)$data[$key] : (int)$this->code->decodeId($data[$key]),
+                "int", "integer" => empty($options['encoded']) ? (int)$data[$key] : (int)Code::decodeId($data[$key]),
                 "bool", "boolean" => $data[$key] ? 1 : 0,
                 default => (string)$data[$key],
             };
@@ -218,7 +219,7 @@ class Model
 
         // if the id is not a number, try decoding it
         if (is_string($id) && !is_numeric($id)) {
-            $id = $this->code->decodeId($id);
+            $id = Code::decodeId($id);
         }
 
         if (!empty($id) && $data = $this->db->getFirst($this->table, "*", ["id" => $id])) {
