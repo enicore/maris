@@ -3,8 +3,12 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Utils;
 
+/**
+ *
+ * @package Enicore\Maris
+ */
 class Text
 {
     /**
@@ -13,7 +17,6 @@ class Text
      * @param string|int $size The file size in bytes.
      * @return string The human-readable file size (e.g., "1.5 MB").
      */
-
     public static function sizeToString(string|int $size): string
     {
         if (!is_numeric($size)) {
@@ -83,34 +86,10 @@ class Text
      * Converts a string representation of "true" or "false" into the corresponding boolean value.
      *
      * @param string $value The string to convert.
-     * @return bool|string The boolean value or the original string if not "true" or "false".
+     * @return bool The boolean value, or false if $value is not 'true' or 'false'.
      */
-    public static function strToBool(string $value): bool|string
+    public static function strToBool(string $value): bool
     {
-        return match ($value) {
-            "true" => true,
-            "false" => false,
-            default => $value,
-        };
-    }
-
-    /**
-     * Finds the last occurrence of a substring (`needle`) in a string (`haystack`), starting from a given position (`offset`).
-     *
-     * @param string $haystack The string in which to search.
-     * @param string $needle The substring to search for.
-     * @param int $offset The position from which to start the search (default is 0).
-     * @return bool|int Returns the position of the last occurrence of the substring, or false if not found.
-     */
-    public static function backwardStrpos(string $haystack, string $needle, int $offset = 0): bool|int
-    {
-        if (empty($needle)) {
-            return false;
-        }
-
-        $length = strlen($haystack);
-        $offset = $offset > 0 ? $length - $offset : abs($offset);
-        $pos = strpos(strrev($haystack), strrev($needle), $offset);
-        return ($pos === false) ? false : $length - $pos - strlen($needle);
+        return trim($value) === 'true';
     }
 }

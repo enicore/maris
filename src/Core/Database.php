@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Core;
 
 use PDO;
 use PDOStatement;

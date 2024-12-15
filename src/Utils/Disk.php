@@ -3,11 +3,15 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Utils;
 
 use enshrined\svgSanitize\Sanitizer;
 use Exception;
 
+/**
+ *
+ * @package Enicore\Maris
+ */
 class Disk
 {
     /**
@@ -245,12 +249,14 @@ class Disk
      * @param bool|int $maxWidth - The maximum width allowed for the image (default is no limit).
      * @param bool|int $maxHeight - The maximum height allowed for the image (default is no limit).
      * @param bool|string $forceTargetType - Specifies the target file type (e.g., 'image/jpeg', 'image/png').
+     * @param bool $bypassUploadedCheck - if true, skips is_uploaded_file() check for unit tests or unique scenarios
      * @return string|bool Returns the path of the saved file on success, or false on failure.
      */
     public static function saveUploadedImage(array $uploadInfo, string $targetFile, bool|int $maxSize = false,
                                              null|string &$error = null, bool|int $maxWidth = false,
                                              bool|int $maxHeight = false,
-                                             bool|string $forceTargetType = false): string|bool
+                                             bool|string $forceTargetType = false,
+                                             bool $bypassUploadedCheck = false): string|bool
     {
         $allowedExtensions = ["png", "jpg", "jpeg", "gif", "svg", "ico"];
         $allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/svg", "image/svg+xml", "image/x-icon"];
@@ -281,8 +287,8 @@ class Disk
                 throw new Exception("The file has not been uploaded properly. (44352)");
             }
 
-            // check if the file is an uploaded file
-            if (!is_uploaded_file($filePath)) {
+            // check if the file is an uploaded file (can bypass for unit tests or unique scenarios)
+            if (!$bypassUploadedCheck && !is_uploaded_file($filePath)) {
                 throw new Exception("The file has not been uploaded properly. (44353)");
             }
 

@@ -3,7 +3,9 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Core;
+
+use Enicore\Maris\Utils\Code;
 
 /**
  * This class represents a form with HTML elements. It allows setting, validating, and extracting form data. The form
@@ -161,17 +163,6 @@ class Form
         }
 
         return $result;
-    }
-
-    /**
-     * Sets form data from the request, using the provided record ID.
-     *
-     * @param int|string $recordId The ID of the record to fetch data for.
-     * @return bool Returns true if data was set successfully, false otherwise.
-     */
-    public function setDataFromRequest(int|string $recordId): bool
-    {
-        return $this->setDataFromElements($recordId, $this->request->get("elements"));
     }
 
     /**

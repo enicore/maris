@@ -1,0 +1,6 @@
+2.0 ()
+================
+- reformatted namespaces
+- added resources
+- added dependency injection class
+- code improvements and cleanup

@@ -6,6 +6,11 @@
             "Enicore\\Maris\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "minimum-stability": "stable",
     "require": {
         "php": "^8.3",

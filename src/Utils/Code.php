@@ -3,18 +3,22 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Utils;
+
+use Exception;
 
 /**
  * Provides utility functions for encoding, decoding, and encrypting data. Includes methods for obfuscating IDs,
  * handling encryption/decryption, and encoding integers into short string representations. The class supports multiple
  * character sets for base encoding, such as BASE_36, BASE_62, and BASE_92, and implements methods for compressing and
  * encrypting data.
+ *
+ * @package Enicore\Maris
  */
 class Code
 {
-    private const string IDENTIFIER = "A8";
-    private const array DATA_TYPES = ["boolean", "integer", "double", "string", "array", "object", "NULL"];
+    protected const string IDENTIFIER = "A8";
+    protected const array DATA_TYPES = ["boolean", "integer", "double", "string", "array", "object", "NULL"];
     public const string BASE_36_CHARSET = "0123456789abcdefghijklmnopqrstuvwxyz";
     public const string BASE_62_CHARSET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public const string BASE_92_CHARSET = "!\"#$%&'()*+-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`".
@@ -167,7 +171,7 @@ class Code
 
         try {
             $data = self::decryptString($hexEncoded ? @hex2bin($data) : $data, $key);
-        } catch (\Exception) {
+        } catch (Exception) {
             return false;
         }
 
@@ -215,11 +219,7 @@ class Code
      */
     public static function encryptString(string $string, string $key): bool|string
     {
-        if (empty($string) || !function_exists("openssl_encrypt")) {
-            return false;
-        }
-
-        if (empty($key)) {
+        if (empty($string) || empty($key) || !function_exists("openssl_encrypt")) {
             return false;
         }
 
@@ -236,11 +236,7 @@ class Code
      */
     public static function decryptString(string $string, string $key): bool|string
     {
-        if (empty($string) || !function_exists("openssl_decrypt")) {
-            return false;
-        }
-
-        if (empty($key)) {
+        if (empty($string) || empty($key) || !function_exists("openssl_decrypt")) {
             return false;
         }
 
@@ -369,7 +365,7 @@ class Code
      * @param bool $reverse Whether to reverse the shuffling.
      * @return array The shuffled alphabet mapping.
      */
-    private static function getShuffledAlphabet(string $salt, bool $reverse = false): array
+    protected static function getShuffledAlphabet(string $salt, bool $reverse = false): array
     {
         $alphabet = $original = "0123456789abcdef";
         $length = 16;

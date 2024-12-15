@@ -3,11 +3,14 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Core;
+
+use Exception;
+use RuntimeException;
 
 /**
- * Manages session data, providing convenient methods for storing, retrieving, checking, and
- * removing session values. Ensures that the session is active before each operation.
+ * Manages session data, providing convenient methods for storing, retrieving, checking, and removing session values.
+ * Ensures that the session is active before each operation.
  *
  * @package Enicore\Maris
  */
@@ -96,29 +99,21 @@ class Session
     }
 
     /**
-     * Initializes the session with the given data, overwriting any existing session data.
+     * Starts the session if it hasn't been started yet.
      *
      * @param array $data An associative array of key-value pairs to initialize the session with.
      * @return void
      */
-    public function initialize(array $data = []): void
-    {
-        $this->start();
-        $_SESSION = $data;
-    }
-
-    /**
-     * Starts the session if it hasn't been started yet.
-     *
-     * @return void
-     */
-    public function start(): void
+    public function start(array $data = []): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             try {
                 session_start();
-            } catch (\Exception $e) {
-                throw new \RuntimeException("Failed to start session: " . $e->getMessage());
+                if (!empty($data)) {
+                    $_SESSION = $data;
+                }
+            } catch (Exception $e) {
+                throw new RuntimeException("Failed to start session: " . $e->getMessage());
             }
         }
     }

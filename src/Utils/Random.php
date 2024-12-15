@@ -3,12 +3,15 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Utils;
 
+use Enicore\Maris\Resources\Countries;
 use Exception;
 
 /**
  * A utility class for generating random tokens, HTML content, words, user agents, and other random data.
+ *
+ * @package Enicore\Maris
  */
 class Random
 {
@@ -212,7 +215,8 @@ class Random
      */
     public static function countryCode(): string
     {
-        $list = array_keys(Countries::getAllCountries());
+        $list = Countries::getCodes();
+
         return $list[rand(0, count($list) - 1)];
     }
 
@@ -463,7 +467,7 @@ class Random
             "angin", "barat", "angin", "sepoi", "sepoi", "zest", "minat", "besar", "gairah", "animo", "zest", "bumbu",
             "rasa", "enak", "perangsang", "zip", "bunyi", "desing", "semangat", "zipper", "retsluiting", "zip", "fastener",
             "retsluiting", "yatch", "kapal", "ringan", "utk", "bunga", "kapal", "mewah", "utk", "pesiar", "yak", "lembu",
-            "berbulu", "panjang", "di", "Asia", "Tengah", "yam", "ubi", "yap", "mendengking", "menyalak", "omong", "kosong",
+            "berbulu", "panjang", "di", "asia", "tengah", "yam", "ubi", "yap", "mendengking", "menyalak", "omong", "kosong",
             "yard", "kayu", "utk", "menggantungkan", "yearning", "rindu", "sekali", "yeast", "ragi", "yellow", "fever",
             "sakit", "kuning", "yelp", "menyalak", "yeoman", "menolong", "org", "dlm", "kesusahan", "yew", "pohon",
             "cemara", "berdaun", "hijau", "muda", "yield", "menghasilkan", "kayu", "tengkuk", "pikulan", "bag", "dada",

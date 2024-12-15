@@ -3,8 +3,13 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Utils;
 
+/**
+ * Utility class for handling URLs, browser info, email validation, etc.
+ *
+ * @package Enicore\Maris
+ */
 class Web
 {
     /**
@@ -12,7 +17,6 @@ class Web
      *
      * @return string The host URL (e.g., "https://example.com").
      */
-
     public static function getHost(): string
     {
         return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" .

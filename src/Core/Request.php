@@ -3,7 +3,10 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris;
+namespace Enicore\Maris\Core;
+
+use Enicore\Maris\Utils\Code;
+use Exception;
 
 /**
  * Handles request data from GET, POST, and JSON input, providing access to and manipulation of request parameters.
@@ -24,7 +27,7 @@ class Request
                 $_POST ?? [],
                 json_decode(file_get_contents('php://input'), true) ?? []
             );
-        } catch (\Exception) {
+        } catch (Exception) {
         }
     }
 
