@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Utils;
+namespace Enicore\Maris\Classes;
 
 /**
  * Utility class for handling URLs, browser info, email validation, etc.
@@ -204,4 +204,98 @@ class Web
         return true;
     }
 
+    /**
+     * Generates a versioned URL for an asset by appending a hash of its last modified time.
+     * Ensures browsers always load the latest version when the file changes.
+     *
+     * @param string $path The relative path to the asset (e.g. "/scripts/app.js").
+     * @return string The versioned asset URL with ?v= appended.
+     */
+    public static function versionedUrl(string $path): string
+    {
+        $filePath = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/' . ltrim($path, '/'));
+        $version = '';
+
+        if ($filePath && is_file($filePath)) {
+            $version = filemtime($filePath);
+        } else {
+            error_log("Asset not found (381995): " . $path);
+        }
+
+        return $path . ($version ? '?v=' . md5($version) : '');
+    }
+
+    /**
+     * Builds a <script> tag with a versioned src attribute for cache-busting.
+     *
+     * @param string $path The relative path to the JavaScript file.
+     * @param array $attr Additional attributes to include in the tag (e.g. ['defer' => true]).
+     * @return string The complete <script> HTML tag.
+     */
+    public static function scriptTag(string $path, array $attr = []): string
+    {
+        return "<script src='" . self::versionedUrl($path) . "'" . self::attr($attr) . "></script>";
+    }
+
+    /**
+     * Builds a <link rel="stylesheet"> tag with a versioned href for cache-busting.
+     *
+     * @param string $path The relative path to the CSS file.
+     * @param array $attr Additional attributes to include (e.g. ['media' => 'all']).
+     * @return string The complete <link> HTML tag for the stylesheet.
+     */
+    public static function styleTag(string $path, array $attr = []): string
+    {
+        return "<link rel='stylesheet' href='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+    }
+
+    /**
+     * Builds a <link rel="icon"> tag with a versioned href for cache-busting.
+     *
+     * @param string $path The relative path to the icon file.
+     * @param array $attr Additional attributes to include (e.g. ['type' => 'image/png']).
+     * @return string The complete <link> HTML tag for the icon.
+     */
+    public static function iconTag(string $path, array $attr = []): string
+    {
+        return "<link rel='icon' href='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+    }
+
+    /**
+     * Builds an <img> tag with a versioned src attribute for cache-busting.
+     *
+     * @param string $path The relative path to the image file.
+     * @param array $attr Additional attributes to include (e.g. ['alt' => 'Logo']).
+     * @return string The complete <img> HTML tag.
+     */
+    public static function imageTag(string $path, array $attr = []): string
+    {
+        return "<img src='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+    }
+
+    /**
+     * Converts an array of attributes into a properly escaped HTML string.
+     *
+     * - String/int values are rendered as key='value'.
+     * - Boolean attributes (e.g. ['defer' => true]) are rendered with the key only when true (e.g. defer),
+     *   and omitted entirely when false.
+     * - Null values are ignored and not rendered.
+     *
+     * @param array $attr An associative array of attributes (e.g. ['class' => 'btn', 'id' => 'submit', 'defer' => true]).
+     * @return string The concatenated attributes string, ready to append to an HTML tag.
+     */
+    private static function attr(array $attr): string
+    {
+        $result = '';
+        foreach ($attr as $k => $v) {
+            if (is_bool($v)) {
+                if ($v) {
+                    $result .= ' ' . htmlspecialchars($k, ENT_QUOTES);
+                }
+                continue;
+            }
+            $result .= ' ' . htmlspecialchars($k, ENT_QUOTES) . "='" . htmlspecialchars((string)$v, ENT_QUOTES) . "'";
+        }
+        return $result;
+    }
 }

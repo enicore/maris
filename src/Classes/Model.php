@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Core;
+namespace Enicore\Maris\Classes;
 
 /**
  * A base model class providing essential CRUD operations and data handling for derived models in the framework.

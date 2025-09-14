@@ -1,5 +1,5 @@
 <?php
-namespace Tests\Utils;
+namespace Tests\Classes;
 
 use PHPUnit\Framework\TestCase;
 use Enicore\Maris\Utils\Text;

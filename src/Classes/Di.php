@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Core;
+namespace Enicore\Maris\Classes;
 
 use BadMethodCallException;
 use InvalidArgumentException;
@@ -39,6 +39,7 @@ use RuntimeException;
  * @method static Auth auth()
  * @method static Database db()
  * @method static Request request()
+ * @method static Config config()
  *
  * @package Enicore\Maris
  */
@@ -50,6 +51,7 @@ class Di
         'auth'    => Auth::class,
         'db'      => Database::class,
         'request' => Request::class,
+        'config'  => Config::class,
     ];
 
     /**

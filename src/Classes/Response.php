@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Core;
+namespace Enicore\Maris\Classes;
 
 /**
  * Manages JSON-based AJAX responses for success and error handling, providing utilities for sending responses and

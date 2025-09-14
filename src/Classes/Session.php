@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Core;
+namespace Enicore\Maris\Classes;
 
 use Exception;
 use RuntimeException;
@@ -23,9 +23,9 @@ class Session
      * @param mixed|null $default The default value to return if the key does not exist.
      * @return mixed The value associated with the session key or the default.
      */
-    public function get(string $key, mixed $default = null): mixed
+    public static function get(string $key, mixed $default = null): mixed
     {
-        $this->start();
+        self::start();
         return $_SESSION[$key] ?? $default;
     }
 
@@ -35,9 +35,9 @@ class Session
      * @param string $key The session key to check.
      * @return bool True if the session key exists, false otherwise.
      */
-    public function has(string $key): bool
+    public static function has(string $key): bool
     {
-        $this->start();
+        self::start();
         return array_key_exists($key, $_SESSION);
     }
 
@@ -48,9 +48,9 @@ class Session
      * @param mixed $value The value to store in the session.
      * @return void
      */
-    public function set(string $key, mixed $value): void
+    public static function set(string $key, mixed $value): void
     {
-        $this->start();
+        self::start();
         $_SESSION[$key] = $value;
     }
 
@@ -60,9 +60,9 @@ class Session
      * @param string $key The session key to remove.
      * @return void
      */
-    public function remove(string $key): void
+    public static function remove(string $key): void
     {
-        $this->start();
+        self::start();
         unset($_SESSION[$key]);
     }
 
@@ -71,9 +71,9 @@ class Session
      *
      * @return void
      */
-    public function destroy(): void
+    public static function destroy(): void
     {
-        $this->start();
+        self::start();
         $_SESSION = [];
 
         if (ini_get("session.use_cookies")) {
@@ -92,9 +92,9 @@ class Session
      *
      * @return void
      */
-    public function regenerate(): void
+    public static function regenerate(): void
     {
-        $this->start();
+        self::start();
         session_regenerate_id(true);
     }
 
@@ -104,10 +104,17 @@ class Session
      * @param array $data An associative array of key-value pairs to initialize the session with.
      * @return void
      */
-    public function start(array $data = []): void
+    public static function start(array $data = []): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             try {
+                session_set_cookie_params([
+                    'secure'   => 'on',
+                    'httponly' => true,
+                    'samesite' => 'Strict',
+                ]);
+                ini_set('session.use_only_cookies', '1');
+                ini_set('session.use_trans_sid', '0');
                 session_start();
                 if (!empty($data)) {
                     $_SESSION = $data;
@@ -116,5 +123,14 @@ class Session
                 throw new RuntimeException("Failed to start session: " . $e->getMessage());
             }
         }
+    }
+
+    public static function getCsrfToken(): string
+    {
+        self::start();
+        if (!self::has('csrf')) {
+            self::set('csrf', bin2hex(random_bytes(32)));
+        }
+        return self::get('csrf');
     }
 }

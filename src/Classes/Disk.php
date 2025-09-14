@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Utils;
+namespace Enicore\Maris\Classes;
 
 use enshrined\svgSanitize\Sanitizer;
 use Exception;

@@ -3,9 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Core;
-
-use Enicore\Maris\Utils\Code;
+namespace Enicore\Maris\Classes;
 
 /**
  * This class represents a form with HTML elements. It allows setting, validating, and extracting form data. The form
