@@ -11,23 +11,19 @@ composer require enicore/maris
 
 To copy from a local directory, add the following configuration in your composer.json:
 
-```json
-{
+```composer
+    "require": {
+        "enicore/maris": "@dev"
+    },
     "repositories": [
         {
             "type": "path",
-            "url": "path/to/maris",
+            "url": "/path/to/enicore/maris",
             "options": {
-                "symlink": false
+                "symlink": true
             }
         }
-    ],
-    "require": {
-        "enicore/maris": "*"
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
-}
+    ]
 ```
 
 ## License
