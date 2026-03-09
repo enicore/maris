@@ -17,7 +17,7 @@ final class CsrfMiddleware implements MiddlewareInterface
             $stored = Session::get('csrf');
 
             if (!$stored || !$sent || !hash_equals($stored, $sent)) {
-                $response = (new Response())
+                $response = (new \Slim\Psr7\Response())
                     ->withStatus(403)
                     ->withHeader('Content-Type', 'text/html; charset=utf-8');
                 $response->getBody()->write('Invalid CSRF token');
