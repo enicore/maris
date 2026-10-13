@@ -129,18 +129,18 @@ class Random
     {
         $minLength = max(1, $minLength);
         $maxLength = max($minLength, $maxLength);
-        $characters = $upperCase ? "QWERTYUIOPASDFGHJKLZXCVBNM" : "qwertyuiopasdfghjklzxcvbnm";
+        $letters = $upperCase ? "QWERTYUIOPASDFGHJKLZXCVBNM" : "qwertyuiopasdfghjklzxcvbnm";
+        $characters = $useSpaces ? $letters . "   " : $letters;
+        $length = rand($minLength, $maxLength);
         $result = "";
 
-        if ($useSpaces) {
-            $characters .= "   ";
+        // no spaces at the ends, so the string has the requested length
+        for ($i = 0; $i < $length; $i++) {
+            $chars = $i == 0 || $i == $length - 1 ? $letters : $characters;
+            $result .= $chars[rand(0, strlen($chars) - 1)];
         }
 
-        for ($i = 0; $i < rand($minLength, $maxLength); $i++) {
-            $result .= $characters[rand(0, strlen($characters) - 1)];
-        }
-
-        return trim($result);
+        return $result;
     }
 
     /**
@@ -472,12 +472,12 @@ class Random
             "sakit", "kuning", "yelp", "menyalak", "yeoman", "menolong", "org", "dlm", "kesusahan", "yew", "pohon",
             "cemara", "berdaun", "hijau", "muda", "yield", "menghasilkan", "kayu", "tengkuk", "pikulan", "bag", "dada",
             "pd", "gaun", "yoke", "of", "oxen", "sepasang", "lembu", "yoke", "pass", "udik", "yolk", "kuning", "telur",
-            "yon", "di", "sana", "yonder", "di", "sana", "yore", "berkenaan", "dgn", "jaman", "hari", "Natal", "wroth",
+            "yon", "di", "sana", "yonder", "di", "sana", "yore", "berkenaan", "dgn", "jaman", "hari", "natal", "wroth",
             "marah", "gusar", "wrought", "iron", "besi", "tempa", "wroughtup", "state", "kead", "gelisah", "remedies",
             "obat", "yg", "dijual", "oleh", "tukang", "obat", "quadrangle", "benda", "berbentuk", "segi", "bj", "alat",
             "pengukur", "sudut", "quadrilateral", "benda", "berbentuk", "segi", "quadruped", "hewan", "berkaki", "quagmire",
             "rawa", "paya", "quail", "takut", "hilang", "semangat", "quaint", "menarik", "menyenangkan", "krn", "gereja",
-            "Kristen", "yg", "mengadakan", "kebaktian", "tan", "quaker", "pa", "seorang", "pendeta", "qualification",
+            "kristen", "yg", "mengadakan", "kebaktian", "tan", "quaker", "pa", "seorang", "pendeta", "qualification",
             "qualm", "ragu", "ragu", "sangsi", "sesal", "mual", "quandary", "kead", "ragu", "ragu", "bimbang", "dilema",
             "quarrel", "buruan", "perburuan", "mangsa", "quart", "galon", "ltr", "quartette", "penyanyi", "quartz", "batu",
             "akik", "permata", "sajak", "baris", "quaver", "bunyi", "bergetar", "gemetar", "titi", "nada", "quay",
@@ -489,7 +489,7 @@ class Random
             "sempurna", "quintette", "penyanyi", "org", "quip", "menggetarkan", "tempat", "anak", "panah", "qui", "vive",
             "waspada", "berjaga", "jaga", "quixotic", "pemurah", "suatu", "permainan", "quota", "jatah", "quotient",
             "hasil", "bagi", "quoth", "berkata", "quote", "mengutip", "ternak", "kowtow", "membungkuk", "sangat",
-            "menghormati", "kosher", "toko", "makanan", "bangsa", "Yahudi", "kecil", "knick", "knack", "barang", "penghias",
+            "menghormati", "kosher", "toko", "makanan", "bangsa", "yahudi", "kecil", "knick", "knack", "barang", "penghias",
             "kecil", "yg", "tdk", "penting", "knickers", "celana", "dalam", "lutut", "knead", "memukul", "adonan",
             "meremas", "memijit", "mengurut", "knapsack", "ransel", "knave", "penjahat", "ketrampilan", "ketangkasan",
             "seni", "kith", "and", "kin", "teman", "sanak", "saudara", "kite", "burung", "elang", "alat", "perkakas",
@@ -514,7 +514,7 @@ class Random
             "jangle", "bunyi", "berdencing", "jargon", "bhs", "yg", "dipakai", "oleh", "kelompok", "tertentu", "cerah",
             "yg", "ribut", "bunyinya", "jeer", "mencemooh", "mengejek", "menertawakan", "jemmy", "linggis", "jelly",
             "ketat", "dr", "kulit", "jersey", "baju", "kaos", "jetty", "dermaga", "pangkalan", "jib", "layar", "kecil",
-            "itinerary", "rencana", "perjalanan", "IOU", "surat", "hutang", "isthmus", "genting", "tanah", "itch", "gatal",
+            "itinerary", "rencana", "perjalanan", "iou", "surat", "hutang", "isthmus", "genting", "tanah", "itch", "gatal",
             "ire", "kemarahan", "irascible", "cepat", "marah", "iris", "selaput", "pelangi", "lumba", "yg", "daunnya",
             "panjang", "inveigh", "against", "menyerang", "dgn", "kata", "inveigle", "mmebujuk", "spy", "berbuat",
             "intrude", "masuk", "tanpa", "diundang", "mengganggu", "intrusion", "gangguan", "masuk", "tanpa", "diundang",
@@ -524,9 +524,9 @@ class Random
             "mengubur", "dr", "index", "indigenous", "pribumi", "indigo", "biru", "tua", "nila", "infantry", "pasukan",
             "jalan", "kaki", "burung", "bangkai", "burung", "nasar", "vulnerable", "mudah", "rusak", "tdk", "kebal",
             "vulgar", "tdkk", "sopan", "tdk", "berlaku", "voile", "kain", "voal", "tipis", "utk", "gaun", "viva", "voce",
-            "scr", "lisan", "viz", "namely", "wadi", "sungai", "kering", "di", "Mesir", "wadi", "sultry", "pengap", "panas",
+            "scr", "lisan", "viz", "namely", "wadi", "sungai", "kering", "di", "mesir", "wadi", "sultry", "pengap", "panas",
             "tdk", "berangin", "superb", "hebat", "pantai", "supine", "terlentang", "malas", "pap", "bubur", "bayi",
-            "papacy", "pemerintahan", "Paus", "papal", "sahabat", "pallor", "muka", "pucat", "pallid", "pucat", "kelihatan",
+            "papacy", "pemerintahan", "paus", "papal", "sahabat", "pallor", "muka", "pucat", "pallid", "pucat", "kelihatan",
             "sakit", "palisade", "pagar", "dr", "batang", "abandon", "putus", "asa", "batal", "abase", "menghina",
             "menurunkan", "martabat", "abasement", "penghinaan", "penjagalan", "hewan", "abbess", "kepala", "asrama",
             "biarawati", "abbott", "kepala", "biarawan", "biara", "abbey", "isinya", "abduct", "penculikan", "abet", "aid",
@@ -534,7 +534,7 @@ class Random
             "rumah", "tinggal", "abode", "rumah", "tinggal", "aboard", "dlm", "umum", "akan", "melepaskan", "jabatan",
             "abscess", "bisul", "bettle", "kumbang", "befall", "menimpa", "befit", "halus", "amfibi", "becalmed", "kapal",
             "yg", "terhenti", "krn", "tdk", "ada", "angin", "beckon", "memanggil", "bertingkah", "aneh", "bedlam", "huru",
-            "hara", "rumah", "sakit", "jiwa", "bee", "lebah;make", "a", "line", "for", "lembu", "beige", "warna", "batu",
+            "hara", "rumah", "sakit", "jiwa", "bee", "lebah", "make", "a", "line", "for", "lembu", "beige", "warna", "batu",
             "pasir", "belabour", "menghantam", "belated", "terlambat", "beleaguer", "menara", "lonceng", "belie", "memberi",
             "kesan", "keliru", "tdk", "menepati", "janji", "bellicose", "suka", "berteriak", "keras", "bellows", "alat",
             "penghembus", "udara", "ke", "api", "orgel", "belly", "isi", "perut", "igneous", "bukit", "yg", "terbentuk",
@@ -542,7 +542,7 @@ class Random
             "imbibe", "minum", "meneguk", "mencamkan", "menyerap", "imbue", "penuh", "immemorial", "dulu", "kala", "shg",
             "terlupakan", "immerse", "membenamkan", "imp", "anak", "setan", "nakal", "meneruskan", "rahasia", "impasse",
             "jln", "buntu", "impassioned", "penuh", "semangat", "odour", "berbau", "ode", "achre", "warna", "coklat",
-            "kekuningan", "octagon", "al", "segi", "occident", "negara", "Barat", "obviate", "welter", "berkubang",
+            "kekuningan", "octagon", "al", "segi", "occident", "negara", "barat", "obviate", "welter", "berkubang",
             "kekacauan", "wend", "pergi", "ke", "wench", "perempuan", "muda", "wer", "biri", "jantan", "susu", "dibuat",
             "keju", "vale", "lembah", "upbraid", "memarahi", "upbringing", "mengasuh", "upstream", "ke", "hantu", "spool",
             "kumparan", "spoor", "jejak", "binatang", "spore", "spora", "spouse", "suami", "istri", "sprat", "tinggi",
@@ -551,7 +551,7 @@ class Random
             "sesuatu", "yg", "besar", "lever", "pengungkit", "leverage", "daya", "pengungkit", "levity", "batu", "kawi",
             "mange", "kurap", "mangy", "berkudis", "manger", "palungan", "mangle", "alat", "pemeras", "cucian", "manila",
             "rami", "manifest", "nyata", "daftar", "muatan", "kapal", "wujud", "manifesto", "pernyataan", "prinsip",
-            "tanah", "milik", "bangsawan", "manse", "rumah", "pendeta", "grj", "Presbitaria", "mansion", "rumah", "besar",
+            "tanah", "milik", "bangsawan", "manse", "rumah", "pendeta", "grj", "presbitaria", "mansion", "rumah", "besar",
             "indah", "manure", "pupuk", "baja", "manuscipt", "naskah", "map", "out", "merancang", "menyusun", "mengatur",
             "maple", "kayu", "berlalunya", "peristiwa", "marchioness", "istri", "janda", "bangsawan", "inggris", "mare",
             "kuda", "betina", "mares", "dgn", "laut", "mariner", "pelaut", "marionette", "boneka", "yg", "digerakkan",

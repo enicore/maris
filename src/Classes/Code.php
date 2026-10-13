@@ -76,6 +76,11 @@ class Code
             }
         }
 
+        // a valid id decodes to hex digits only
+        if (!ctype_xdigit($string)) {
+            return null;
+        }
+
         $len = hexdec(substr($string, -2)) - 16;
 
         if ($len < 0) {
@@ -202,7 +207,7 @@ class Code
         return match (self::DATA_TYPES[$type]) {
             "boolean" => $data == "1",
             "integer" => (int)$data,
-            "double" => (double)$data,
+            "double" => (float)$data,
             "array" => json_decode($data, true),
             "object" => json_decode($data),
             "NULL" => null,

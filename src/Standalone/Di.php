@@ -3,8 +3,9 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Classes;
+namespace Enicore\Maris\Standalone;
 
+use Enicore\Maris\Classes\Config;
 use BadMethodCallException;
 use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;

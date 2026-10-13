@@ -131,13 +131,19 @@ class Disk
         $files = array_diff(scandir($dir), [".", ".."]);
 
         foreach ($files as $file) {
-            if (is_dir($dir . $file)) {
-                self::removeDir($dir . $file, $followLinks);
+            // check links first: is_dir() is true for a link to a directory, which must not be emptied unless following
+            if (is_link($dir . $file)) {
+                if ($followLinks && ($target = realpath($dir . $file))) {
+                    is_dir($target) ? self::removeDir($target, true) : unlink($target);
+                }
+
+                unlink($dir . $file);
                 continue;
             }
 
-            if (is_link($dir . $file) && $followLinks) {
-                unlink(readlink($dir . $file));
+            if (is_dir($dir . $file)) {
+                self::removeDir($dir . $file, $followLinks);
+                continue;
             }
 
             unlink($dir . $file);
@@ -159,7 +165,7 @@ class Disk
         // remove trailing slash
         $directory = rtrim($directory, '/\\');
 
-        if (!$handle = opendir($directory)) {
+        if (!is_dir($directory) || !$handle = opendir($directory)) {
             $error = "Cannot open directory"; // not translated, logged for admins only
             return false;
         }
@@ -189,7 +195,7 @@ class Disk
             $bytes = $b;
         }
 
-        if (($b = self::sizeToBytes(ini_get('upload_max_filesize'))) > 0 && $b < $bytes) {
+        if (($b = self::sizeToBytes(ini_get('upload_max_filesize'))) > 0 && (!$bytes || $b < $bytes)) {
             $bytes = $b;
         }
 
@@ -210,10 +216,10 @@ class Disk
 
         if ($unit) {
             // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
-            return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+            return (int)round((float)$size * pow(1024, stripos('bkmgtpezy', $unit[0])));
         }
 
-        return round($size);
+        return (int)round((float)$size);
     }
 
     /**
@@ -295,7 +301,7 @@ class Disk
             // check the uploaded file extension
             $pathInfo = pathinfo($fileName);
 
-            if (!in_array(strtolower($pathInfo['extension']), $allowedExtensions)) {
+            if (!in_array(strtolower($pathInfo['extension'] ?? ""), $allowedExtensions)) {
                 throw new Exception("Invalid file extension. The allowed extensions are: jpg, png, gif, svg.");
             }
 
@@ -335,6 +341,8 @@ class Disk
 
                 case "image/svg":
                     $sanitizer = new Sanitizer();
+                    // remote references would be loaded when the svg is displayed (tracking, requests to other hosts)
+                    $sanitizer->removeRemoteReferences(true);
                     $image = $sanitizer->sanitize(file_get_contents($filePath));
                     break;
 
@@ -379,14 +387,13 @@ class Disk
                         throw new Exception("Cannot resample image.");
                     }
 
-                    // destroy the original image, and assign new image to old var so the saving can continue below
-                    imagedestroy($image);
+                    // assign the new image to the old var so the saving can continue below
                     $image = $newImage;
                 }
             }
 
             // save the image to the target file
-            if ($forceTargetType && $type != "image/svg") {
+            if ($forceTargetType && $type != "image/svg" && $type != "image/x-icon") {
                 $type = $forceTargetType;
             }
 
@@ -434,22 +441,14 @@ class Disk
                 throw new Exception("Cannot save the uploaded image (44357). [$newType]");
             }
 
-            // remove the source file and image resource
+            // remove the source file
             if (file_exists($filePath)) {
                 @unlink($filePath);
-            }
-
-            if ($type != "image/svg" && $type != "image/x-icon") {
-                imagedestroy($image);
             }
 
             return $targetFile;
 
         } catch (Exception $e) {
-            if ($image && $type != "image/svg" && $type != "image/x-icon") {
-                imagedestroy($image);
-            }
-
             if (file_exists($filePath)) {
                 @unlink($filePath);
             }

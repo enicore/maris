@@ -5,7 +5,7 @@
  */
 namespace Enicore\Maris\Classes;
 
-use Exception;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -16,6 +16,16 @@ use RuntimeException;
  */
 class Session
 {
+    private static array $options = [
+        'name'     => '',
+        'lifetime' => 0,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => true,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ];
+
     /**
      * Returns a value from the session if it exists, or a default value if it doesn't.
      *
@@ -99,6 +109,45 @@ class Session
     }
 
     /**
+     * Sets the session cookie options used when the session starts. Unknown options throw an exception.
+     *
+     * - name: the cookie name (PHP's default, PHPSESSID, if empty)
+     * - lifetime: the cookie lifetime in seconds (0: until the browser is closed)
+     * - path, domain: the cookie scope
+     * - secure: send the cookie over https only (browsers allow it on http://localhost too)
+     * - httponly: hide the cookie from JavaScript
+     * - samesite: Lax (default), Strict or None. Strict doesn't send the cookie when the site is opened from a link
+     *   on another site or in an email, so logged-in users appear logged out on that first page.
+     *
+     * @param array $options The options to change, the others keep their values.
+     * @return void
+     */
+    public static function setOptions(array $options): void
+    {
+        if ($unknown = array_diff_key($options, self::$options)) {
+            throw new InvalidArgumentException("Unknown session options: " . implode(", ", array_keys($unknown)));
+        }
+
+        $sameSite = ucfirst(strtolower($options['samesite'] ?? 'Lax'));
+
+        if (!in_array($sameSite, ["Lax", "Strict", "None"])) {
+            throw new InvalidArgumentException("Invalid samesite session option: {$options['samesite']}");
+        }
+
+        self::$options = array_merge(self::$options, $options);
+    }
+
+    /**
+     * Returns the session cookie options.
+     *
+     * @return array
+     */
+    public static function getOptions(): array
+    {
+        return self::$options;
+    }
+
+    /**
      * Starts the session if it hasn't been started yet.
      *
      * @param array $data An associative array of key-value pairs to initialize the session with.
@@ -106,22 +155,36 @@ class Session
      */
     public static function start(array $data = []): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            try {
-                session_set_cookie_params([
-                    'secure'   => 'on',
-                    'httponly' => true,
-                    'samesite' => 'Strict',
-                ]);
-                ini_set('session.use_only_cookies', '1');
-                ini_set('session.use_trans_sid', '0');
-                session_start();
-                if (!empty($data)) {
-                    $_SESSION = $data;
-                }
-            } catch (Exception $e) {
-                throw new RuntimeException("Failed to start session: " . $e->getMessage());
-            }
+        if (session_status() !== PHP_SESSION_NONE) {
+            return;
+        }
+
+        $options = self::$options;
+
+        if (!empty($options['name'])) {
+            session_name($options['name']);
+        }
+
+        session_set_cookie_params([
+            'lifetime' => (int)$options['lifetime'],
+            'path'     => $options['path'],
+            'domain'   => $options['domain'],
+            'secure'   => (bool)$options['secure'],
+            'httponly' => (bool)$options['httponly'],
+            'samesite' => ucfirst(strtolower($options['samesite'])),
+        ]);
+
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.use_trans_sid', '0');
+        // don't accept session ids the server didn't create (session fixation)
+        ini_set('session.use_strict_mode', '1');
+
+        if (!session_start()) {
+            throw new RuntimeException("Failed to start the session.");
+        }
+
+        if (!empty($data)) {
+            $_SESSION = $data;
         }
     }
 

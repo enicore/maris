@@ -3,9 +3,9 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Classes;
+namespace Enicore\Maris\Standalone;
 
-use Exception;
+use Enicore\Maris\Classes\Code;
 
 /**
  * Handles request data from GET, POST, and JSON input, providing access to and manipulation of request parameters.
@@ -20,14 +20,8 @@ class Request
     public function __construct()
     {
         // Initialize $data with values from GET, POST, and JSON input (often used for AJAX requests).
-        try {
-            $this->data = array_merge(
-                $_GET ?? [],
-                $_POST ?? [],
-                json_decode(file_get_contents('php://input'), true) ?? []
-            );
-        } catch (Exception) {
-        }
+        $json = json_decode((string)file_get_contents('php://input'), true);
+        $this->data = array_merge($_GET, $_POST, is_array($json) ? $json : []);
     }
 
     /**

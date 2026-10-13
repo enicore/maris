@@ -95,8 +95,8 @@ class Timezones
      */
     public static function getTimezones(bool $extended = false,
                                         string $language = 'en',
-                                        string $singleTimezoneFormat = null,
-                                        string $multipleTimezoneFormat = null): array
+                                        ?string $singleTimezoneFormat = null,
+                                        ?string $multipleTimezoneFormat = null): array
     {
         $result = [];
 
@@ -126,7 +126,7 @@ class Timezones
      * @param string|null $format The format string for the timezone name (default: multipleTimezoneFormat).
      * @return string The localized and formatted timezone name, or the raw timezone identifier if formatting fails.
      */
-    public static function getName(string $timezone, string $language = 'en', string $format = null): string
+    public static function getName(string $timezone, string $language = 'en', ?string $format = null): string
     {
         try {
             if (($location = (new DateTimeZone($timezone))->getLocation()) &&

@@ -5,14 +5,26 @@
  */
 namespace Enicore\Maris\Classes;
 
-use Psr\Http\Message\ResponseInterface as Response;
-
+/**
+ * Renders PHP view files. A page is a view rendered inside a layout:
+ * - the layout (layout.php by default) gets $content (the rendered view), $csrf (the session's CSRF token, for
+ *   <meta name="csrf"> that RavenSpa sends with its requests; empty if no session is active, see
+ *   SessionMiddleware), and the page's data
+ * - the views get the page's data as variables
+ * - error.php renders the error pages' content, with $code and $message
+ *
+ * @package Enicore\Maris
+ */
 class View
 {
+    /**
+     * @param string $viewPath The directory of the view files; if empty, src/views next to the directory of the
+     *                         running script.
+     */
     public function __construct(protected string $viewPath = '')
     {
         if (empty($viewPath)) {
-            $this->viewPath = realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../src/views');
+            $this->viewPath = (string)realpath(dirname($_SERVER['SCRIPT_FILENAME']) . '/../src/views');
             if (!is_dir($this->viewPath)) {
                 error_log("View: viewPath doesn't exist.");
             }
@@ -21,44 +33,41 @@ class View
     }
 
     /**
-     * Renders a view file into HTML with provided data.
+     * Renders a view file into HTML with provided data. A view that doesn't exist renders the error view (404).
      *
-     * @param string $view The view name (without .php).
+     * @param string $view The view name (without .php), "home" if empty.
      * @param array $data Variables to extract into the view.
      * @return string The rendered HTML output.
      */
     public function getViewHtml(string $view, array $data = []): string
     {
         if (!$view) $view = 'home';
-        $view = ltrim(str_replace(['..', '\\'], ['', '/'], $view), '/');
+        $view = $this->cleanName($view);
 
         if (!$this->viewExists($view)) {
             $view = 'error';
             $data = ['code' => 404, 'message' => 'Page not found (338119)'];
         }
 
-        extract($data, EXTR_SKIP);
-        ob_start();
-        include $this->viewPath . ltrim("$view.php", '/');
-        return (string)ob_get_clean();
+        return $this->render($view, $data);
     }
 
     /**
-     * Renders the layout with embedded view content and CSRF token.
+     * Renders the layout with the view as its content, and the CSRF token. The data is available to both.
      *
-     * @param string $view The view name (without .php).
+     * @param string|null $view The view name (without .php); null for the layout without content (RavenSpa loads the
+     *                          content of the page itself).
      * @param array $data Variables to extract into the layout and view.
+     * @param string $layout The layout's view name.
      * @return string The rendered HTML output including layout.
      */
-    public function getLayoutHtml(string $view, array $data = []): string
+    public function getLayoutHtml(?string $view, array $data = [], string $layout = 'layout'): string
     {
-        $data['csrf'] = Session::getCsrfToken();
-        $data['content'] = $this->getViewHtml($view, $data);
+        // only with a session, so pages outside the session routes (errors for bots...) don't create sessions
+        $data['csrf'] = session_status() === PHP_SESSION_ACTIVE ? Session::getCsrfToken() : '';
+        $data['content'] = $view === null ? '' : $this->getViewHtml($view, $data);
 
-        extract($data, EXTR_SKIP);
-        ob_start();
-        include $this->viewPath . 'layout.php';
-        return (string)ob_get_clean();
+        return $this->render($this->cleanName($layout), $data);
     }
 
     /**
@@ -69,6 +78,29 @@ class View
      */
     public function viewExists(string $view): bool
     {
-        return file_exists($this->viewPath . ltrim("$view.php", '/'));
+        return is_file($this->viewPath . $this->cleanName($view) . '.php');
+    }
+
+    /**
+     * Removes what could leave the view directory.
+     */
+    private function cleanName(string $view): string
+    {
+        return ltrim(str_replace(['..', '\\', "\0"], ['', '/', ''], $view), '/');
+    }
+
+    private function render(string $view, array $data): string
+    {
+        extract($data, EXTR_SKIP);
+        ob_start();
+
+        try {
+            include $this->viewPath . "$view.php";
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            throw $e;
+        }
+
+        return (string)ob_get_clean();
     }
 }

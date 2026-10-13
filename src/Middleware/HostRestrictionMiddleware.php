@@ -13,12 +13,17 @@ use Psr\Http\Server\RequestHandlerInterface as Handler;
  */
 final class HostRestrictionMiddleware implements MiddlewareInterface
 {
-    public function __construct(private array $allowedDomains) {}
+    public function __construct(private array $allowedDomains)
+    {
+        $this->allowedDomains = array_map('strtolower', $allowedDomains);
+    }
 
     public function process(Request $request, Handler $handler): Response
     {
         $serverParams = $request->getServerParams();
         $host = strtolower($serverParams['HTTP_HOST'] ?? $request->getUri()->getHost());
+        // the Host header includes the port when it isn't the default one
+        $host = preg_replace('/:\d+$/', '', $host);
 
         if (!in_array($host, $this->allowedDomains, true)) {
             $response = new \Slim\Psr7\Response();

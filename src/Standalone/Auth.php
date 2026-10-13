@@ -3,7 +3,9 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Classes;
+namespace Enicore\Maris\Standalone;
+
+use Enicore\Maris\Classes\Session;
 
 /**
  * Handles authentication-related operations, including checking if a user is logged in, retrieving user data from the

@@ -1,17 +1,13 @@
 <?php
 namespace Tests\Classes;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Enicore\Maris\Utils\Text;
+use Enicore\Maris\Classes\Text;
 
-/**
- * @coversDefaultClass \Enicore\Maris\Utils\Text
- */
+#[CoversClass(\Enicore\Maris\Classes\Text::class)]
 class TextTest extends TestCase
 {
-    /**
-     * @covers ::sizeToString
-     */
     public function testSizeToString(): void
     {
         $this->assertSame('1 B', Text::sizeToString(1));
@@ -20,9 +16,6 @@ class TextTest extends TestCase
         $this->assertSame('-', Text::sizeToString('invalid'));
     }
 
-    /**
-     * @covers ::shortenString
-     */
     public function testShortenString(): void
     {
         $this->assertSame('Short text', Text::shortenString('Short text', 20));
@@ -30,9 +23,6 @@ class TextTest extends TestCase
         $this->assertSame('Edge-case...', Text::shortenString('Edge-case test', 10));
     }
 
-    /**
-     * @covers ::removeSlash
-     */
     public function testRemoveSlash(): void
     {
         $this->assertSame('path/to/resource', Text::removeSlash('path/to/resource/'));
@@ -40,9 +30,6 @@ class TextTest extends TestCase
         $this->assertSame('no-slash', Text::removeSlash('no-slash'));
     }
 
-    /**
-     * @covers ::addSlash
-     */
     public function testAddSlash(): void
     {
         $this->assertSame('path/to/resource/', Text::addSlash('path/to/resource'));
@@ -50,9 +37,6 @@ class TextTest extends TestCase
         $this->assertSame('already/has/slash/', Text::addSlash('already/has/slash/'));
     }
 
-    /**
-     * @covers ::strToBool
-     */
     public function testStrToBool(): void
     {
         $this->assertTrue(Text::strToBool('true'));

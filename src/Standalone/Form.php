@@ -3,7 +3,9 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Classes;
+namespace Enicore\Maris\Standalone;
+
+use Enicore\Maris\Classes\Code;
 
 /**
  * This class represents a form with HTML elements. It allows setting, validating, and extracting form data. The form
@@ -127,7 +129,7 @@ class Form
                 if (!empty($element['required_unique'])) {
                     if ($this->db->row(
                         "SELECT id FROM `{$element['required_unique']}` WHERE $key = ? AND (id != ? OR ? IS NULL) LIMIT 1",
-                        [$data[$key], $data['id'], $data['id']])
+                        [$data[$key], $data['id'] ?? null, $data['id'] ?? null])
                     ) {
                         $this->elements[$key]['error'] = "A record with this value already exists.";
                         $result = false;
@@ -155,7 +157,7 @@ class Form
                 default => (string)$data[$key],
             };
 
-            if ($element["input"] == "image" && !empty($element['value'])) {
+            if ($element["input"] == "image" && !empty($this->elements[$key]['value'])) {
                 $this->elements[$key]['uploaded'] = true;
             }
         }

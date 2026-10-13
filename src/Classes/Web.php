@@ -29,10 +29,11 @@ class Web
      *
      * @param string $path The path to append to the URL (optional).
      * @param bool $hostOnly Whether to return only the host.
-     * @param bool $cut The string or array of strings to cut from the URL (optional).
+     * @param string|array|false $cut The string or array of strings to cut from the URL (optional).
      * @return string|bool The full URL or the host; false if the host cannot be determined.
      */
-    public static function getUrl(string $path = "", bool $hostOnly = false, bool $cut = false): string|bool
+    public static function getUrl(string $path = "", bool $hostOnly = false,
+                                  string|array|false $cut = false): string|bool
     {
         // if absolute path specified, simply return it
         if (strpos($path, "://")) {
@@ -86,8 +87,13 @@ class Web
             return $host;
         }
 
+        // the Host header includes the port when it isn't the default one
+        if (preg_match('/^(.+):(\d+)$/', $host, $matches)) {
+            [, $host, $port] = $matches;
+        }
+
         // format port
-        if ($port && is_numeric($port) && $port != "443" && $port != "80") {
+        if ($port &&is_numeric($port) && $port != "443" && $port != "80") {
             $port = ":" . $port;
         } else {
             $port = "";
@@ -234,7 +240,7 @@ class Web
      */
     public static function scriptTag(string $path, array $attr = []): string
     {
-        return "<script src='" . self::versionedUrl($path) . "'" . self::attr($attr) . "></script>";
+        return "<script src='" . htmlspecialchars(self::versionedUrl($path), ENT_QUOTES) . "'" . self::attr($attr) . "></script>";
     }
 
     /**
@@ -246,7 +252,7 @@ class Web
      */
     public static function styleTag(string $path, array $attr = []): string
     {
-        return "<link rel='stylesheet' href='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+        return "<link rel='stylesheet' href='" . htmlspecialchars(self::versionedUrl($path), ENT_QUOTES) . "'" . self::attr($attr) . ">";
     }
 
     /**
@@ -258,7 +264,7 @@ class Web
      */
     public static function iconTag(string $path, array $attr = []): string
     {
-        return "<link rel='icon' href='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+        return "<link rel='icon' href='" . htmlspecialchars(self::versionedUrl($path), ENT_QUOTES) . "'" . self::attr($attr) . ">";
     }
 
     /**
@@ -270,7 +276,7 @@ class Web
      */
     public static function imageTag(string $path, array $attr = []): string
     {
-        return "<img src='" . self::versionedUrl($path) . "'" . self::attr($attr) . ">";
+        return "<img src='" . htmlspecialchars(self::versionedUrl($path), ENT_QUOTES) . "'" . self::attr($attr) . ">";
     }
 
     /**
@@ -288,6 +294,10 @@ class Web
     {
         $result = '';
         foreach ($attr as $k => $v) {
+            if ($v === null) {
+                continue;
+            }
+
             if (is_bool($v)) {
                 if ($v) {
                     $result .= ' ' . htmlspecialchars($k, ENT_QUOTES);

@@ -3,7 +3,7 @@
  * Enicore Maris.
  * Copyright 2024 Enicore Solutions.
  */
-namespace Enicore\Maris\Classes;
+namespace Enicore\Maris\Standalone;
 
 use PDO;
 use PDOStatement;
@@ -33,9 +33,10 @@ class Database
     public function __construct(string $host, string|int $port, string $database, string $username, string $password,
                                 array $options = [])
     {
-        $this->pdo = new PDO("mysql:host=$host;port=$port;dbname=$database", $username, $password, $options);
+        // utf8mb4: MySQL's utf8 is utf8mb3, which can't store 4-byte characters like emoji
+        $this->pdo = new PDO("mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4", $username, $password,
+            $options);
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $this->pdo->exec("SET CHARACTER SET utf8;SET NAMES utf8;");
     }
 
     /**
@@ -107,8 +108,8 @@ class Database
      * @return bool|array Array of results or false if no results
      */
     public function getAll(string $table, array|string $selectFields = "*", array $whereParams = [],
-                           string $orderBy = null, string $orderType = "ASC", int $limit = null,
-                           int $offset = null): bool|array
+                           ?string $orderBy = null, string $orderType = "ASC", ?int $limit = null,
+                           ?int $offset = null): bool|array
     {
         is_array($selectFields) || ($selectFields = [$selectFields]);
         $params = [];
@@ -122,7 +123,7 @@ class Database
         $fields = implode(",", $selectFields);
         $where = !empty($where) ? "WHERE " . implode(" AND ", $where) : "";
         $order = $orderBy ? "ORDER BY $orderBy $orderType" : "";
-        $limit = $limit ? "LIMIT $limit" . ($offset ? ",$offset" : "") : "";
+        $limit = $limit ? "LIMIT $limit" . ($offset ? " OFFSET $offset" : "") : "";
 
         if (($st = $this->query("SELECT $fields FROM `$table` $where $order $limit", $params)) &&
             ($array = $st->fetchAll(PDO::FETCH_ASSOC))
@@ -186,7 +187,7 @@ class Database
     public function getLastError(): string
     {
         $array = $this->pdo->errorInfo();
-        return $array[2];
+        return $array[2] ?? "";
     }
 
     /**
@@ -272,9 +273,10 @@ class Database
             $params[":" . $key] = $val;
         }
 
+        // prefixed, so a field can be in both the data and the condition
         foreach ($whereParams as $key => $val) {
-            $where[] = "$key=:$key";
-            $params[":$key"] = $val;
+            $where[] = "$key=:where_$key";
+            $params[":where_$key"] = $val;
         }
 
         return $this->query(

@@ -1,3 +1,21 @@
+3.0 ()
+================
+- moved the classes for sites without Slim to the Standalone namespace
+- updated Controller for RavenSpa and JSON responses
+- added Input, RouteUrl and Http
+- added Config::fromEnv() for .env and environment settings
+- added SessionMiddleware, AuthMiddleware and SecurityHeadersMiddleware
+- added session cookie options (SameSite=Lax by default)
+- added JSON errors to SlimErrorController and CsrfMiddleware
+- improved CspMiddleware's default policy
+- improved uploaded svg files: remote references are removed
+- added unit tests
+- upgraded enshrined/svg-sanitize to 1.0 (security fixes)
+- upgraded PHPUnit to 12
+- fixed Database not storing emoji (utf8mb4)
+- fixed bugs in Database, Disk, Web, Config, Request, Form, Code, Random and HostRestrictionMiddleware
+- fixed PHP 8.4 and 8.5 deprecation warnings
+
 2.2 (2026-03-09)
 ================
 - upgraded enshrined/svg-sanitize to version 0.22

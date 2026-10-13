@@ -1,17 +1,13 @@
 <?php
 namespace Tests\Resources;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Enicore\Maris\Resources\Timezones;
 
-/**
- * @covers Timezones
- */
+#[CoversClass(\Enicore\Maris\Resources\Timezones::class)]
 class TimezonesTest extends TestCase
 {
-    /**
-     * @covers Timezones::getTimezones
-     */
     public function testGetTimezonesWithDefaultParameters()
     {
         $timezones = Timezones::getTimezones();
@@ -19,9 +15,6 @@ class TimezonesTest extends TestCase
         $this->assertNotEmpty($timezones);
     }
 
-    /**
-     * @covers Timezones::getTimezones
-     */
     public function testGetTimezonesWithExtendedTrue()
     {
         $timezones = Timezones::getTimezones(true);
@@ -29,9 +22,6 @@ class TimezonesTest extends TestCase
         $this->assertNotEmpty($timezones);
     }
 
-    /**
-     * @covers Timezones::getName
-     */
     public function testGetNameWithValidTimezone()
     {
         $timezone = 'Europe/Berlin';
@@ -41,9 +31,6 @@ class TimezonesTest extends TestCase
         $this->assertNotEmpty($localizedName);
     }
 
-    /**
-     * @covers Timezones::getName
-     */
     public function testGetNameWithInvalidTimezone()
     {
         $timezone = 'Invalid/Timezone';
@@ -52,9 +39,6 @@ class TimezonesTest extends TestCase
         $this->assertEquals($timezone, $localizedName);
     }
 
-    /**
-     * @covers Timezones::getUtcOffset
-     */
     public function testGetUtcOffsetWithValidTimezone()
     {
         $timezone = 'Europe/London';
@@ -63,9 +47,6 @@ class TimezonesTest extends TestCase
         $this->assertMatchesRegularExpression('/^[+-]\d{2}:\d{2}$/', $utcOffset);
     }
 
-    /**
-     * @covers Timezones::getUtcOffset
-     */
     public function testGetUtcOffsetWithInvalidTimezone()
     {
         $timezone = 'Invalid/Timezone';
@@ -74,9 +55,6 @@ class TimezonesTest extends TestCase
         $this->assertEquals('Invalid Time Zone', $utcOffset);
     }
 
-    /**
-     * @covers Timezones::timeZoneExists
-     */
     public function testTimeZoneExistsWithValidTimezone()
     {
         $timezone = 'America/New_York';
@@ -85,9 +63,6 @@ class TimezonesTest extends TestCase
         $this->assertTrue($exists);
     }
 
-    /**
-     * @covers Timezones::timeZoneExists
-     */
     public function testTimeZoneExistsWithInvalidTimezone()
     {
         $timezone = 'Invalid/Timezone';
@@ -96,9 +71,6 @@ class TimezonesTest extends TestCase
         $this->assertFalse($exists);
     }
 
-    /**
-     * @covers Timezones::getTimezoneData
-     */
     public function testGetTimezoneDataWithDefaultParameters()
     {
         $data = Timezones::getTimezoneData();
@@ -109,9 +81,6 @@ class TimezonesTest extends TestCase
         $this->assertContains('America/New_York', $data['US']);
     }
 
-    /**
-     * @covers Timezones::getTimezoneData
-     */
     public function testGetTimezoneDataWithExtendedTrue()
     {
         $data = Timezones::getTimezoneData(true);
@@ -120,14 +89,10 @@ class TimezonesTest extends TestCase
         $this->assertNotEmpty($data);
     }
 
-    /**
-     * @covers Timezones::createLocalizedName
-     */
     public function testCreateLocalizedNameWithValidData()
     {
         $reflection = new \ReflectionClass(Timezones::class);
         $method = $reflection->getMethod('createLocalizedName');
-        $method->setAccessible(true);
 
         $result = $method->invoke(null, 'Europe/Berlin', 'en', '%country (%offset)', 'DE');
 
@@ -136,9 +101,6 @@ class TimezonesTest extends TestCase
         $this->assertStringContainsString('Germany', $result); // Assuming "Germany" is returned in English
     }
 
-    /**
-     * @covers Timezones::convertTime
-     */
     public function testConvertTimeWithValidTimezones()
     {
         $result = Timezones::convertTime('2024-12-14 15:00:00', 'America/New_York', 'Europe/Berlin');
@@ -148,9 +110,6 @@ class TimezonesTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $result);
     }
 
-    /**
-     * @covers Timezones::convertTime
-     */
     public function testConvertTimeWithInvalidTimezones()
     {
         $result = Timezones::convertTime('2024-12-14 15:00:00', 'Invalid/Timezone', 'Europe/Berlin');
@@ -158,9 +117,6 @@ class TimezonesTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @covers Timezones::getCurrentTime
-     */
     public function testGetCurrentTimeWithValidTimezone()
     {
         $result = Timezones::getCurrentTime('Europe/Berlin');
@@ -170,9 +126,6 @@ class TimezonesTest extends TestCase
         $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $result);
     }
 
-    /**
-     * @covers Timezones::getCurrentTime
-     */
     public function testGetCurrentTimeWithInvalidTimezone()
     {
         $result = Timezones::getCurrentTime('Invalid/Timezone');
@@ -180,9 +133,6 @@ class TimezonesTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @covers Timezones::getTimezonesByCountry
-     */
     public function testGetTimezonesByCountryWithValidCountry()
     {
         $result = Timezones::getTimezonesByCountry('US');
@@ -192,9 +142,6 @@ class TimezonesTest extends TestCase
         $this->assertContains('America/New_York', $result);
     }
 
-    /**
-     * @covers Timezones::getTimezonesByCountry
-     */
     public function testGetTimezonesByCountryWithInvalidCountry()
     {
         $result = Timezones::getTimezonesByCountry('ZZ');

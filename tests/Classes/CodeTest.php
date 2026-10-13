@@ -1,12 +1,11 @@
 <?php
 namespace Tests\Classes;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Enicore\Maris\Utils\Code;
+use Enicore\Maris\Classes\Code;
 
-/**
- * @coversDefaultClass \Enicore\Maris\Utils\Code
- */
+#[CoversClass(\Enicore\Maris\Classes\Code::class)]
 class CodeTest extends TestCase
 {
     private string $encryptionKey;
@@ -16,10 +15,6 @@ class CodeTest extends TestCase
         $this->encryptionKey = 'test-encryption-key';
     }
 
-    /**
-     * @covers ::encodeId
-     * @covers ::decodeId
-     */
     public function testEncodeDecodeId(): void
     {
         $id = 12345;
@@ -30,12 +25,14 @@ class CodeTest extends TestCase
         $randomizedEncoded = Code::encodeId($id, true);
         $this->assertNotNull($randomizedEncoded);
         $this->assertSame($id, Code::decodeId($randomizedEncoded));
+
+        // invalid input from requests
+        $this->assertNull(Code::decodeId(''));
+        $this->assertNull(Code::decodeId('invalid'));
+        $this->assertNull(Code::decodeId('x'));
+        $this->assertNull(Code::encodeId(0));
     }
 
-    /**
-     * @covers ::encodeId
-     * @covers ::decodeId
-     */
     public function testEncodeDecodeIdWithSalt(): void
     {
         $id = 54321;
@@ -44,10 +41,6 @@ class CodeTest extends TestCase
         $this->assertSame($id, Code::decodeId($encoded));
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptBoolean(): void
     {
         $data = true;
@@ -65,10 +58,6 @@ class CodeTest extends TestCase
         $this->assertSame($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptInteger(): void
     {
         $data = 12345;
@@ -79,10 +68,6 @@ class CodeTest extends TestCase
         $this->assertSame($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptDouble(): void
     {
         $data = 12345.67;
@@ -93,10 +78,6 @@ class CodeTest extends TestCase
         $this->assertSame($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptString(): void
     {
         $data = "This is a test string.";
@@ -107,10 +88,6 @@ class CodeTest extends TestCase
         $this->assertSame($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptArray(): void
     {
         $data = ['key' => 'value', 'numbers' => [1, 2, 3]];
@@ -121,10 +98,6 @@ class CodeTest extends TestCase
         $this->assertSame($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptObject(): void
     {
         $data = (object)['key' => 'value', 'numbers' => [1, 2, 3]];
@@ -135,10 +108,6 @@ class CodeTest extends TestCase
         $this->assertEquals($data, $decrypted);
     }
 
-    /**
-     * @covers ::encrypt
-     * @covers ::decrypt
-     */
     public function testEncryptDecryptNull(): void
     {
         $data = null;
@@ -149,10 +118,6 @@ class CodeTest extends TestCase
         $this->assertNull($decrypted);
     }
 
-    /**
-     * @covers ::encryptString
-     * @covers ::decryptString
-     */
     public function testEncryptDecryptStringDirect(): void
     {
         $string = "This is a test string.";
@@ -163,9 +128,6 @@ class CodeTest extends TestCase
         $this->assertSame($string, $decrypted);
     }
 
-    /**
-     * @covers ::generatePassword
-     */
     public function testGeneratePassword(): void
     {
         $password = Code::generatePassword(16);
@@ -173,9 +135,6 @@ class CodeTest extends TestCase
         $this->assertSame(16, strlen($password));
     }
 
-    /**
-     * @covers ::generateRandomToken
-     */
     public function testGenerateRandomToken(): void
     {
         $token = Code::generateRandomToken(32);
@@ -183,10 +142,6 @@ class CodeTest extends TestCase
         $this->assertSame(32, strlen($token));
     }
 
-    /**
-     * @covers ::baseEncode
-     * @covers ::baseDecode
-     */
     public function testBaseEncodeDecode(): void
     {
         $number = 123456789;
@@ -197,10 +152,6 @@ class CodeTest extends TestCase
         $this->assertSame($number, $decoded);
     }
 
-    /**
-     * @covers ::textToBinary
-     * @covers ::binaryToText
-     */
     public function testTextToBinaryAndBinaryToText(): void
     {
         $text = "This is a test binary string.";

@@ -1,17 +1,13 @@
 <?php
 namespace Tests\Resources;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use Enicore\Maris\Resources\Locales;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \Enicore\Maris\Resources\Locales
- */
+#[CoversClass(\Enicore\Maris\Resources\Locales::class)]
 class LocalesTest extends TestCase
 {
-    /**
-     * @covers ::getLocales
-     */
     public function testGetLocalesReturnsAllLocales(): void
     {
         $locales = Locales::getLocales();
@@ -21,9 +17,6 @@ class LocalesTest extends TestCase
         $this->assertArrayHasKey('fr_FR', $locales, 'getLocales should include French (FR)');
     }
 
-    /**
-     * @covers ::getLocales
-     */
     public function testGetLocalesFiltersByCodes(): void
     {
         $locales = Locales::getLocales(['en_US', 'fr_FR']);
@@ -32,9 +25,6 @@ class LocalesTest extends TestCase
         $this->assertArrayHasKey('fr_FR', $locales, 'getLocales should include French (FR)');
     }
 
-    /**
-     * @covers ::getLocales
-     */
     public function testGetLocalesReturnsLocalizedNames(): void
     {
         $locales = Locales::getLocales(['en_US'], true);
@@ -42,9 +32,6 @@ class LocalesTest extends TestCase
         $this->assertEquals('English (US)', $locales['en_US'], 'getLocales should return the localized name');
     }
 
-    /**
-     * @covers ::getCodes
-     */
     public function testGetCodes(): void
     {
         $codes = Locales::getCodes();
@@ -53,44 +40,29 @@ class LocalesTest extends TestCase
         $this->assertContains('fr_FR', $codes, 'getCodes should include French (FR)');
     }
 
-    /**
-     * @covers ::getName
-     */
     public function testGetNameInEnglish(): void
     {
         $name = Locales::getName('en_US', false);
         $this->assertEquals('English (United States)', $name, 'getName should return the English name for the locale');
     }
 
-    /**
-     * @covers ::getName
-     */
     public function testGetNameLocalized(): void
     {
         $name = Locales::getName('fr_FR', true);
         $this->assertEquals('Français (France)', $name, 'getName should return the localized name for the locale');
     }
 
-    /**
-     * @covers ::getName
-     */
     public function testGetNameInvalidCode(): void
     {
         $name = Locales::getName('xx_XX');
         $this->assertFalse($name, 'getName should return false for an invalid locale code');
     }
 
-    /**
-     * @covers ::codeExists
-     */
     public function testCodeExistsValidCode(): void
     {
         $this->assertTrue(Locales::codeExists('en_US'), 'codeExists should return true for a valid locale code');
     }
 
-    /**
-     * @covers ::codeExists
-     */
     public function testCodeExistsInvalidCode(): void
     {
         $this->assertFalse(Locales::codeExists('xx_XX'), 'codeExists should return false for an invalid locale code');
